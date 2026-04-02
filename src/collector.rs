@@ -29,13 +29,26 @@ pub fn analyze(app: &DynamicObject) -> Option<DriftInfo> {
     let git_value = annotations.get(ANNOTATION_KEY)?;
     let git_autosync = git_value == "true";
 
-    // Check if spec.syncPolicy.automated exists (non-null)
+    // Check if spec.syncPolicy.automated exists and is not explicitly set to `enabled: false`
     let actual_autosync = app
         .data
         .get("spec")
         .and_then(|spec| spec.get("syncPolicy"))
         .and_then(|sp| sp.get("automated"))
-        .is_some_and(|v| !v.is_null());
+        .map(|v| {
+            if v.is_null() {
+                return false;
+            }
+            // Check if "enabled" key exists inside "automated" block (ArgoCD UI behavior)
+            if let Some(enabled) = v.get("enabled") {
+                if let Some(b) = enabled.as_bool() {
+                    return b;
+                }
+            }
+            // If "automated" block exists but no "enabled: false", it is implicitly enabled
+            true
+        })
+        .unwrap_or(false);
 
     // Extract labels for metric dimensions
     let labels = app.metadata.labels.as_ref();
