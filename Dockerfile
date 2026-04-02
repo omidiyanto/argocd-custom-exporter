@@ -1,12 +1,15 @@
 # syntax=docker/dockerfile:1
 
 # Build stage
-FROM rust:1.85-bookworm AS builder
+FROM rust:latest AS builder
 
 WORKDIR /build
 
-# Cache dependencies: copy manifests and create stub source files
+# Cache dependencies: copy manifest and generate Cargo.lock automatically
 COPY Cargo.toml ./
+RUN cargo generate-lockfile
+
+# Create stub source files to build and cache external dependencies
 RUN mkdir src \
     && echo "fn main() {}" > src/main.rs \
     && echo "" > src/collector.rs \
