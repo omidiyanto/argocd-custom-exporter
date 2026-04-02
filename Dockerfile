@@ -5,15 +5,15 @@ FROM rust:latest AS builder
 
 WORKDIR /build
 
-# Cache dependencies: copy manifest and generate Cargo.lock automatically
+# Cache dependencies: copy manifest and create stub source files to build
 COPY Cargo.toml ./
-RUN cargo generate-lockfile
 
 # Create stub source files to build and cache external dependencies
 RUN mkdir src \
     && echo "fn main() {}" > src/main.rs \
     && echo "" > src/collector.rs \
     && echo "" > src/metrics.rs \
+    && cargo generate-lockfile \
     && cargo build --release \
     && rm -rf src
 
