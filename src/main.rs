@@ -80,7 +80,8 @@ async fn main() -> anyhow::Result<()> {
 
     // Reflector: in-memory cache backed by K8s Watch API
     // Initial LIST is paginated (500 per page) to avoid overloading kube-apiserver
-    let (store, writer) = reflector::store();
+    let writer = reflector::store::Writer::<DynamicObject>::new(api_resource.clone());
+    let store = writer.as_reader();
     let watch_config = watcher::Config::default().page_size(500);
     let rf = reflector(writer, watcher(apps, watch_config))
         .default_backoff()
