@@ -31,8 +31,7 @@ impl Config {
                 .ok()
                 .and_then(|v| v.parse().ok())
                 .unwrap_or(9184),
-            namespace: std::env::var("EXPORTER_NAMESPACE")
-                .unwrap_or_else(|_| "argocd".to_string()),
+            namespace: std::env::var("EXPORTER_NAMESPACE").unwrap_or_else(|_| "argocd".to_string()),
         }
     }
 }
@@ -56,8 +55,7 @@ async fn handle_health() -> &'static str {
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info".into()),
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
         .json()
         .init();
@@ -75,8 +73,7 @@ async fn main() -> anyhow::Result<()> {
     // Define ArgoCD Application CRD api resource
     let gvk = GroupVersionKind::gvk("argoproj.io", "v1alpha1", "Application");
     let api_resource = ApiResource::from_gvk(&gvk);
-    let apps: Api<DynamicObject> =
-        Api::namespaced_with(client, &config.namespace, &api_resource);
+    let apps: Api<DynamicObject> = Api::namespaced_with(client, &config.namespace, &api_resource);
 
     // Reflector: in-memory cache backed by K8s Watch API
     // Initial LIST is paginated (500 per page) to avoid overloading kube-apiserver
