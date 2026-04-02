@@ -1,0 +1,25 @@
+[package]
+name = "argocd-custom-exporter"
+version = "0.1.0"
+edition = "2021"
+description = "Lightweight Prometheus exporter for ArgoCD autosync policy drift detection"
+license = "MIT"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+kube = { version = "0.98", features = ["runtime", "client"] }
+k8s-openapi = { version = "0.24", features = ["latest"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+axum = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+futures = "0.3"
+anyhow = "1"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

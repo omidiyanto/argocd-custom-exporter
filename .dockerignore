@@ -1,0 +1,8 @@
+target/
+.git/
+.gitignore
+*.md
+deploy/
+.dockerignore
+clippy.toml
+rustfmt.toml
